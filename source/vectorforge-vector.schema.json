@@ -1,0 +1,193 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-vector.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "divt": {
+      "$ref": "divt.schema.json#/$defs/DIVT"
+    },
+    "record": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "$ref": "vectorforge-rawref.schema.json"
+          },
+          "type": "array"
+        },
+        "chain": {
+          "additionalProperties": false,
+          "properties": {
+            "prev_divt_id": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "prev_hash_b64": {
+              "type": "string"
+            },
+            "seq": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "stream_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "stream_id",
+            "seq"
+          ],
+          "type": "object"
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "fidelity": {
+          "additionalProperties": false,
+          "properties": {
+            "knobs": {
+              "type": "object"
+            },
+            "profile_divt_id": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "profile_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "profile_id",
+            "profile_divt_id"
+          ],
+          "type": "object"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "record_id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "record_type": {
+          "type": "string"
+        },
+        "retention": {
+          "additionalProperties": false,
+          "properties": {
+            "policy": {
+              "type": "string"
+            },
+            "policy_id": {
+              "type": "string"
+            },
+            "raw_available_until_us": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "raw_window_s": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "raw_available_until_us",
+            "policy_id"
+          ],
+          "type": "object"
+        },
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "const": "vectorforge.vector"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "version"
+          ],
+          "type": "object"
+        },
+        "source": {
+          "additionalProperties": false,
+          "properties": {
+            "labels": {
+              "type": "object"
+            },
+            "source_id": {
+              "type": "string"
+            },
+            "source_type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_id",
+            "source_type"
+          ],
+          "type": "object"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "time": {
+          "additionalProperties": false,
+          "properties": {
+            "end_us": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "observed_us": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "start_us": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "start_us",
+            "end_us",
+            "observed_us"
+          ],
+          "type": "object"
+        },
+        "vector": {
+          "enum": [
+            "rfvector",
+            "pulsevector",
+            "flowvector",
+            "exchangevector",
+            "videovector"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "vector",
+        "record_type",
+        "record_id",
+        "tenant_id",
+        "time",
+        "source",
+        "chain",
+        "retention",
+        "fidelity",
+        "payload"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "record",
+    "divt"
+  ],
+  "title": "VectorForge Vector Record Schema",
+  "type": "object"
+}

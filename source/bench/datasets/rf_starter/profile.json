@@ -1,0 +1,29 @@
+{
+  "schema": {
+    "name": "vectorforge.profile",
+    "version": "0.1.7"
+  },
+  "profile_id": "rf.default.95",
+  "vector": "rfvector",
+  "continuity_level": 2,
+  "target_pf_q15": 31129,
+  "knobs": {
+    "segment_ms": 1000,
+    "overlap_ms": 250,
+    "fingerprint": "wavelet_fingerprint_v1"
+  },
+  "context_basis": [
+    {
+      "name": "wavelet_fingerprint_v1",
+      "weight_q15": 20000,
+      "metric": "frobenius_q15",
+      "notes": "normalized Frobenius similarity"
+    },
+    {
+      "name": "detection_parity_v1",
+      "weight_q15": 12768,
+      "metric": "f1",
+      "notes": "event parity when detections present"
+    }
+  ]
+}

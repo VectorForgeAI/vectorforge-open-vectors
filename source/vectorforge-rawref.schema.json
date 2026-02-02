@@ -1,0 +1,55 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-rawref.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_divt_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "artifact_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "content_type": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "locator": {
+      "type": "object"
+    },
+    "time": {
+      "additionalProperties": false,
+      "properties": {
+        "end_us": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_us": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_us",
+        "end_us"
+      ],
+      "type": "object"
+    },
+    "uri": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_id",
+    "kind",
+    "uri",
+    "time",
+    "content_type",
+    "artifact_divt_id"
+  ],
+  "title": "VectorForge RawRef Schema",
+  "type": "object"
+}

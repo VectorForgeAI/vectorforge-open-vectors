@@ -1,0 +1,89 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-profile.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "context_basis": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "weight_q15": {
+            "maximum": 32768,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "weight_q15",
+          "metric"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "continuity_level": {
+      "maximum": 3,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "knobs": {
+      "type": "object"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "schema": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "vectorforge.profile"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "target_pf_q15": {
+      "maximum": 32768,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "vector": {
+      "enum": [
+        "rfvector",
+        "pulsevector",
+        "flowvector",
+        "exchangevector",
+        "videovector"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "profile_id",
+    "vector",
+    "continuity_level",
+    "knobs",
+    "context_basis",
+    "target_pf_q15"
+  ],
+  "title": "VectorForge Fidelity Profile Schema",
+  "type": "object"
+}

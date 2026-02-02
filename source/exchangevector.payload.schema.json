@@ -1,0 +1,77 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/exchangevector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "exchange": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "additionalProperties": false,
+          "properties": {
+            "asset": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "asset"
+          ],
+          "type": "object"
+        },
+        "crypto": {
+          "type": "object"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "fees": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "transaction_event_v1"
+        },
+        "occurred_us": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "parties": {
+          "type": "object"
+        },
+        "status": {
+          "type": "string"
+        },
+        "txn_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "txn_id",
+        "event_id",
+        "event_type",
+        "occurred_us",
+        "amount",
+        "status"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "exchange"
+  ],
+  "title": "ExchangeVector Payload Schema (v0.1.7 baseline)",
+  "type": "object"
+}

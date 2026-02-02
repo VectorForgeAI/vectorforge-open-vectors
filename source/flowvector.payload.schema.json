@@ -1,0 +1,70 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/flowvector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "flow": {
+      "additionalProperties": false,
+      "properties": {
+        "actors": {
+          "type": "object"
+        },
+        "content": {
+          "additionalProperties": false,
+          "properties": {
+            "lang": {
+              "type": "string"
+            },
+            "mime": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "text_sha3_512_b64": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mime"
+          ],
+          "type": "object"
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "kind": {
+          "const": "content_item_v1"
+        },
+        "links": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "retrieved_us": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "uri",
+        "retrieved_us",
+        "content"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "flow"
+  ],
+  "title": "FlowVector Payload Schema (v0.1.7 baseline)",
+  "type": "object"
+}

@@ -1,0 +1,37 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-error.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capture_index": {
+      "type": "integer"
+    },
+    "capture_key": {
+      "type": "string"
+    },
+    "details": {
+      "type": "object"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "error_type": {
+      "type": "string"
+    },
+    "retryable": {
+      "type": "boolean"
+    },
+    "source_file": {
+      "type": "string"
+    },
+    "source_uri": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "error_type",
+    "error_message"
+  ],
+  "title": "VectorForge Error Payload Schema",
+  "type": "object"
+}

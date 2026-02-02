@@ -1,0 +1,55 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/videovector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "video": {
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "keyframes": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "video_segment_v1",
+            "video_event_v1"
+          ]
+        },
+        "motion": {
+          "type": "object"
+        },
+        "stream": {
+          "type": "object"
+        },
+        "tracks": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "stream"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "video"
+  ],
+  "title": "VideoVector Payload Schema (v0.1.7 baseline)",
+  "type": "object"
+}

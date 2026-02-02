@@ -1,0 +1,598 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vectorforge.io/schemas/divt.schema.json",
+  "title": "VectorForge DataFoundry DIVT Schema",
+  "description": "Complete schema definitions for Data Integrity Validation Tokens (DIVT) - the core cryptographic data structure used throughout VectorForge DataFoundry.",
+  "$defs": {
+    "HashMode": {
+      "type": "string",
+      "enum": ["text_v1", "json_canon_v1", "binary_v1"],
+      "description": "Canonicalization mode used for hashing content before signing.",
+      "x-enum-descriptions": {
+        "text_v1": "Plain text canonicalization - UTF-8 normalized, BOM stripped, line endings normalized to LF",
+        "json_canon_v1": "JSON canonicalization with sorted keys, no floats allowed, integers within safe range (-(2^53-1) to 2^53-1)",
+        "binary_v1": "Binary content - raw bytes with no canonicalization, used for non-text data"
+      }
+    },
+    "LedgerStatus": {
+      "type": "string",
+      "enum": ["pending", "anchored", "retry", "failed"],
+      "description": "Anchoring status in the immutable ledger (ImmuDB).",
+      "x-enum-descriptions": {
+        "pending": "DIVT is queued for anchoring, not yet written to ImmuDB",
+        "anchored": "DIVT is successfully written to ImmuDB with a transaction ID",
+        "retry": "Anchoring failed and will be retried with exponential backoff",
+        "failed": "Anchoring permanently failed after maximum retry attempts (typically 5)"
+      }
+    },
+    "CryptoMode": {
+      "type": "string",
+      "enum": ["fips", "pqc", "hybrid"],
+      "default": "hybrid",
+      "description": "Signing mode determining which cryptographic algorithms are used.",
+      "x-enum-descriptions": {
+        "fips": "ECDSA P-521 signatures only (FIPS 186-5 compliant)",
+        "pqc": "ML-DSA-65 post-quantum signatures only (NIST FIPS 204)",
+        "hybrid": "Both ECDSA P-521 and ML-DSA-65 signatures for quantum-safe transition"
+      }
+    },
+    "Signatures": {
+      "type": "object",
+      "description": "Hybrid signature pair containing ECDSA and/or PQC signatures.",
+      "properties": {
+        "ecdsa": {
+          "type": "string",
+          "description": "Base64-encoded ECDSA P-521 signature. Present when crypto_mode is 'fips' or 'hybrid'.",
+          "pattern": "^[A-Za-z0-9+/]+=*$"
+        },
+        "pqc": {
+          "type": "string",
+          "description": "Base64-encoded ML-DSA-65 (Dilithium) post-quantum signature. Present when crypto_mode is 'pqc' or 'hybrid'.",
+          "pattern": "^[A-Za-z0-9+/]+=*$"
+        },
+        "key_ver": {
+          "type": "string",
+          "description": "Key version identifier indicating which keypair was used for signing (e.g., 'v1', 'v2').",
+          "pattern": "^v[0-9]+$"
+        }
+      },
+      "required": ["key_ver"],
+      "additionalProperties": false
+    },
+    "DIVT": {
+      "type": "object",
+      "description": "Data Integrity Validation Token - the core data structure representing a cryptographically signed content hash.",
+      "properties": {
+        "divt_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier (UUID v4) for this DIVT."
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Fixed tenant identifier. Single-tenant mode uses a constant value."
+        },
+        "hash_b64": {
+          "type": "string",
+          "description": "Base64-encoded SHA3-512 hash (64 bytes decoded) of the canonicalized content.",
+          "pattern": "^[A-Za-z0-9+/]{86}==$",
+          "minLength": 88,
+          "maxLength": 88
+        },
+        "hash_mode": {
+          "$ref": "#/$defs/HashMode"
+        },
+        "hash_version": {
+          "type": "string",
+          "const": "sha3-512-v1",
+          "description": "Hash algorithm version. Currently always 'sha3-512-v1'."
+        },
+        "crypto_mode": {
+          "$ref": "#/$defs/CryptoMode"
+        },
+        "signatures": {
+          "$ref": "#/$defs/Signatures"
+        },
+        "signature_version": {
+          "type": "string",
+          "description": "Key version used for signing, links to the signing keypair.",
+          "pattern": "^v[0-9]+$"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional arbitrary JSON metadata (max 4KB). NOT included in the hash calculation.",
+          "maxProperties": 100,
+          "additionalProperties": true
+        },
+        "ledger_status": {
+          "$ref": "#/$defs/LedgerStatus"
+        },
+        "ledger_tx_id": {
+          "type": "string",
+          "description": "ImmuDB transaction ID assigned after successful anchoring. Only present when ledger_status is 'anchored'."
+        },
+        "revoked": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this DIVT has been revoked."
+        },
+        "revoked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when revocation occurred. Only present if revoked is true."
+        },
+        "revocation_reason": {
+          "type": "string",
+          "description": "Human-readable explanation for why the DIVT was revoked. Only present if revoked is true."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the DIVT was created."
+        }
+      },
+      "required": [
+        "divt_id",
+        "tenant_id",
+        "hash_b64",
+        "hash_mode",
+        "hash_version",
+        "signatures",
+        "signature_version",
+        "ledger_status",
+        "revoked",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "RegisterRequest": {
+      "type": "object",
+      "description": "Request payload for POST /v1/register - creates a new DIVT.",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Base64-encoded content to hash. Mutually exclusive with hash_b64. Maximum 1MB decoded.",
+          "pattern": "^[A-Za-z0-9+/]*=*$",
+          "maxLength": 1398102
+        },
+        "hash_b64": {
+          "type": "string",
+          "description": "Pre-computed base64-encoded SHA3-512 hash. Mutually exclusive with content.",
+          "pattern": "^[A-Za-z0-9+/]{86}==$",
+          "minLength": 88,
+          "maxLength": 88
+        },
+        "hash_mode": {
+          "$ref": "#/$defs/HashMode"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional arbitrary JSON metadata (max 4KB). NOT included in hash calculation.",
+          "additionalProperties": true
+        }
+      },
+      "required": ["hash_mode"],
+      "oneOf": [
+        {"required": ["content"]},
+        {"required": ["hash_b64"]}
+      ],
+      "additionalProperties": false
+    },
+    "VerifyRequest": {
+      "type": "object",
+      "description": "Request payload for POST /v1/verify - verifies content against a DIVT.",
+      "properties": {
+        "divt_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the DIVT to verify against."
+        },
+        "content": {
+          "type": "string",
+          "description": "Base64-encoded content to verify. Mutually exclusive with hash_b64.",
+          "pattern": "^[A-Za-z0-9+/]*=*$"
+        },
+        "hash_b64": {
+          "type": "string",
+          "description": "Pre-computed base64-encoded SHA3-512 hash to verify. Mutually exclusive with content.",
+          "pattern": "^[A-Za-z0-9+/]{86}==$"
+        }
+      },
+      "required": ["divt_id"],
+      "oneOf": [
+        {"required": ["content"]},
+        {"required": ["hash_b64"]}
+      ],
+      "additionalProperties": false
+    },
+    "VerifyResult": {
+      "type": "object",
+      "description": "Response for POST /v1/verify - detailed verification results.",
+      "properties": {
+        "verified": {
+          "type": "boolean",
+          "description": "True if all checks pass: hash matches, signatures valid, not revoked."
+        },
+        "hash_match": {
+          "type": "boolean",
+          "description": "True if the provided content hash matches the stored hash."
+        },
+        "ecdsa_valid": {
+          "type": "boolean",
+          "description": "True if the ECDSA P-521 signature verification passed (or not required by crypto_mode)."
+        },
+        "pqc_valid": {
+          "type": "boolean",
+          "description": "True if the ML-DSA-65 signature verification passed (or not required by crypto_mode)."
+        },
+        "ledger_status": {
+          "$ref": "#/$defs/LedgerStatus"
+        },
+        "revoked": {
+          "type": "boolean",
+          "description": "True if the DIVT has been revoked."
+        },
+        "revoked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of revocation. Only present if revoked is true."
+        },
+        "revocation_reason": {
+          "type": "string",
+          "description": "Reason for revocation. Only present if revoked is true."
+        },
+        "failure_reason": {
+          "type": "string",
+          "description": "Human-readable explanation of why verification failed. Only present if verified is false."
+        }
+      },
+      "required": [
+        "verified",
+        "hash_match",
+        "ecdsa_valid",
+        "pqc_valid",
+        "ledger_status",
+        "revoked"
+      ],
+      "additionalProperties": false
+    },
+    "RevokeRequest": {
+      "type": "object",
+      "description": "Request payload for POST /v1/divts/{id}/revoke - revokes a DIVT.",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Human-readable explanation for why the DIVT is being revoked.",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": ["reason"],
+      "additionalProperties": false
+    },
+    "PublicKeyInfo": {
+      "type": "object",
+      "description": "Public key information returned by GET /keys/list.",
+      "properties": {
+        "key_id": {
+          "type": "string",
+          "description": "Unique identifier for this key."
+        },
+        "version": {
+          "type": "string",
+          "description": "Key version (e.g., 'v1', 'v2').",
+          "pattern": "^v[0-9]+$"
+        },
+        "algorithm": {
+          "type": "string",
+          "enum": ["ecdsa-p521", "ml-dsa-65"],
+          "description": "Key algorithm type."
+        },
+        "public_key_b64": {
+          "type": "string",
+          "description": "Base64-encoded public key material (DER format).",
+          "pattern": "^[A-Za-z0-9+/]+=*$"
+        },
+        "is_current": {
+          "type": "boolean",
+          "description": "True if this is the current signing key."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this key was generated."
+        }
+      },
+      "required": [
+        "key_id",
+        "version",
+        "algorithm",
+        "public_key_b64",
+        "is_current",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "APIError": {
+      "type": "object",
+      "description": "Standard API error structure.",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_INPUT",
+            "UNAUTHORIZED",
+            "NOT_FOUND",
+            "HASH_MISMATCH",
+            "SIGNATURE_INVALID",
+            "LEDGER_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ],
+          "description": "Machine-readable error code."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message."
+        },
+        "details": {
+          "type": "object",
+          "description": "Optional additional error context.",
+          "additionalProperties": true
+        }
+      },
+      "required": ["code", "message"],
+      "additionalProperties": false
+    },
+    "APIErrorResponse": {
+      "type": "object",
+      "description": "JSON envelope for error responses.",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/APIError"
+        }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "HealthResponse": {
+      "type": "object",
+      "description": "Response for GET /health endpoint.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ok", "degraded"],
+          "description": "Overall health status."
+        },
+        "version": {
+          "type": "string",
+          "description": "Appliance version string."
+        },
+        "uptime": {
+          "type": "string",
+          "description": "Human-readable uptime duration (e.g., '2h30m15s')."
+        },
+        "license": {
+          "$ref": "#/$defs/LicenseHealthResponse"
+        },
+        "world_state": {
+          "$ref": "#/$defs/WorldStateHealthResponse"
+        }
+      },
+      "required": ["status", "version", "uptime"],
+      "additionalProperties": false
+    },
+    "LicenseHealthResponse": {
+      "type": "object",
+      "description": "License status information in health response.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["valid", "expiring_soon", "grace_period", "expired", "invalid", "missing"],
+          "description": "Current license status."
+        },
+        "operational": {
+          "type": "boolean",
+          "description": "True if the license allows the system to operate."
+        },
+        "customer": {
+          "type": "string",
+          "description": "Licensed customer name."
+        },
+        "expires": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "description": "License expiration date (YYYY-MM-DD)."
+        },
+        "days_remaining": {
+          "type": "integer",
+          "description": "Days until expiration (negative if expired)."
+        },
+        "message": {
+          "type": "string",
+          "description": "Additional context about license status."
+        }
+      },
+      "required": ["status", "operational"],
+      "additionalProperties": false
+    },
+    "WorldStateHealthResponse": {
+      "type": "object",
+      "description": "World State health information. Only present when WORLDSTATE_ENABLED=true.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True if World State feature is enabled."
+        },
+        "kafka_connected": {
+          "type": "boolean",
+          "description": "True if connected to Kafka."
+        },
+        "postgres_connected": {
+          "type": "boolean",
+          "description": "True if connected to PostgreSQL."
+        },
+        "queue_size": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Current number of pending events in the queue."
+        },
+        "queue_max": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum queue size."
+        }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    },
+    "CryptoHealthResponse": {
+      "type": "object",
+      "description": "Response for GET /health/crypto endpoint.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "unhealthy"],
+          "description": "Overall crypto health status."
+        },
+        "healthy": {
+          "type": "boolean",
+          "description": "True if all crypto self-tests pass."
+        },
+        "tests": {
+          "$ref": "#/$defs/CryptoTestResults"
+        },
+        "crypto_mode": {
+          "$ref": "#/$defs/CryptoMode"
+        },
+        "fips_provider": {
+          "type": "boolean",
+          "description": "True if FIPS-validated crypto provider is in use."
+        },
+        "keys_present": {
+          "type": "boolean",
+          "description": "True if signing keys are loaded."
+        },
+        "last_test": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when tests were last run."
+        },
+        "failures": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of which checks failed (if any)."
+        },
+        "rng": {
+          "type": "boolean",
+          "description": "Legacy field: RNG test passed."
+        },
+        "hash": {
+          "type": "boolean",
+          "description": "Legacy field: SHA3-512 test passed."
+        },
+        "ecdsa": {
+          "type": "boolean",
+          "description": "Legacy field: ECDSA test passed."
+        },
+        "pqc": {
+          "type": "boolean",
+          "description": "Legacy field: ML-DSA-65 test passed."
+        }
+      },
+      "required": [
+        "status",
+        "healthy",
+        "tests",
+        "crypto_mode",
+        "fips_provider",
+        "keys_present",
+        "last_test"
+      ],
+      "additionalProperties": false
+    },
+    "CryptoTestResults": {
+      "type": "object",
+      "description": "Detailed results for each cryptographic self-test.",
+      "properties": {
+        "rng": {
+          "$ref": "#/$defs/CryptoTestResult"
+        },
+        "sha3_512": {
+          "$ref": "#/$defs/CryptoTestResult"
+        },
+        "ecdsa_p521": {
+          "$ref": "#/$defs/CryptoTestResult"
+        },
+        "mldsa65": {
+          "$ref": "#/$defs/CryptoTestResult"
+        },
+        "key_encrypt": {
+          "$ref": "#/$defs/CryptoTestResult"
+        }
+      },
+      "required": ["rng", "sha3_512", "ecdsa_p521", "mldsa65", "key_encrypt"],
+      "additionalProperties": false
+    },
+    "CryptoTestResult": {
+      "type": "object",
+      "description": "Result of a single cryptographic self-test.",
+      "properties": {
+        "passed": {
+          "type": "boolean",
+          "description": "True if the test passed."
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Test duration in milliseconds."
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if the test failed."
+        }
+      },
+      "required": ["passed", "duration_ms"],
+      "additionalProperties": false
+    },
+    "DIVTCounts": {
+      "type": "object",
+      "description": "DIVT count statistics returned by internal APIs.",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of DIVTs."
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of DIVTs with ledger_status 'pending'."
+        },
+        "anchored": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of DIVTs with ledger_status 'anchored'."
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of DIVTs with ledger_status 'failed'."
+        },
+        "revoked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of revoked DIVTs."
+        }
+      },
+      "required": ["total", "pending", "anchored", "failed", "revoked"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "description": "Root schema object - use $defs for individual type references.",
+  "properties": {
+    "divt": {
+      "$ref": "#/$defs/DIVT"
+    }
+  }
+}

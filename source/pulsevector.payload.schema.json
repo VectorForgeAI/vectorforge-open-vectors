@@ -1,0 +1,129 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/pulsevector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "pulse": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dns": {
+              "type": "object"
+            },
+            "extensions": {
+              "type": "object"
+            },
+            "flow_id": {
+              "type": "string"
+            },
+            "http": {
+              "type": "object"
+            },
+            "kind": {
+              "const": "flow_slice_v1"
+            },
+            "stats": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes_in": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "bytes_out": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "packets_in": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "packets_out": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "bytes_out",
+                "bytes_in",
+                "packets_out",
+                "packets_in"
+              ],
+              "type": "object"
+            },
+            "tls": {
+              "type": "object"
+            },
+            "tuple": {
+              "additionalProperties": false,
+              "properties": {
+                "dst_ip": {
+                  "type": "string"
+                },
+                "dst_port": {
+                  "type": "integer"
+                },
+                "proto": {
+                  "type": "string"
+                },
+                "src_ip": {
+                  "type": "string"
+                },
+                "src_port": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "src_ip",
+                "src_port",
+                "dst_ip",
+                "dst_port",
+                "proto"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "kind",
+            "flow_id",
+            "tuple",
+            "stats"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "attributes": {
+              "type": "object"
+            },
+            "event_type": {
+              "type": "string"
+            },
+            "extensions": {
+              "type": "object"
+            },
+            "kind": {
+              "const": "net_event_v1"
+            },
+            "occurred_us": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "event_type",
+            "occurred_us"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "required": [
+    "pulse"
+  ],
+  "title": "PulseVector Payload Schema (v0.1.7 baseline)",
+  "type": "object"
+}

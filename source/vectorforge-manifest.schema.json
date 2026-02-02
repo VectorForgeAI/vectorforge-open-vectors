@@ -1,0 +1,87 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commitment": {
+      "additionalProperties": false,
+      "properties": {
+        "algo": {
+          "enum": [
+            "merkle_sha3_512_v1",
+            "rolling_sha3_512_v1"
+          ],
+          "type": "string"
+        },
+        "input": {
+          "enum": [
+            "divt.hash_b64",
+            "divt.divt_id",
+            "record_hash_b64"
+          ],
+          "type": "string"
+        },
+        "ordering": {
+          "enum": [
+            "seq_asc",
+            "time_asc_then_seq_asc"
+          ],
+          "type": "string"
+        },
+        "root_b64": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "algo",
+        "root_b64",
+        "input",
+        "ordering"
+      ],
+      "type": "object"
+    },
+    "expected_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "kind": {
+      "const": "manifest_v1"
+    },
+    "member_divt_hashes_b64": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "stream_id": {
+      "type": "string"
+    },
+    "window": {
+      "additionalProperties": false,
+      "properties": {
+        "end_us": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_us": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_us",
+        "end_us"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "kind",
+    "stream_id",
+    "window",
+    "expected_count",
+    "commitment"
+  ],
+  "title": "VectorForge Manifest Record Schema",
+  "type": "object"
+}

@@ -1,0 +1,22 @@
+{
+  "context_basis": [
+    {
+      "metric": "relative_error_l1",
+      "name": "flow_stats_v1",
+      "notes": "bytes/packets parity",
+      "weight_q15": 32768
+    }
+  ],
+  "continuity_level": 2,
+  "knobs": {
+    "sessionization": "5tuple",
+    "slice_s": 10
+  },
+  "profile_id": "pulse.default.95",
+  "schema": {
+    "name": "vectorforge.profile",
+    "version": "0.1.7"
+  },
+  "target_pf_q15": 31129,
+  "vector": "pulsevector"
+}

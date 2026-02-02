@@ -1,0 +1,108 @@
+{
+  "cases": [
+    {
+      "case": "merkle_zero_leaves",
+      "expected_root_b64": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+      "leaf_hashes_b64": [],
+      "leaf_inputs": [],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_one_leaf",
+      "expected_root_b64": "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg==",
+      "leaf_hashes_b64": [
+        "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg=="
+      ],
+      "leaf_inputs": [
+        "a"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_two_leaves",
+      "expected_root_b64": "rjdLHdJa0pHpRLWALjdqXtjvZx4U4IbccpMyRqcIuSxl3TtGwX3h91ITaxHvfkjEKsvq53xty/P+YFljeFojXg==",
+      "leaf_hashes_b64": [
+        "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg==",
+        "hEbEbuA3k7puWBO6DbRIAAiSbdHRnv4sjrkvkDTal00hca5IPynOOnntT91iGuHtFP4SUyr5Xd0HKHec5aqELQ=="
+      ],
+      "leaf_inputs": [
+        "a",
+        "b"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_three_leaves_dup",
+      "expected_root_b64": "+SpargREZwXVFdy9huY2DdRrXVa7S8rZuLARhUNQDfWv91hJFUxMQhmT8RKzVv2NGYI0lE2LINekxzOOrayq3w==",
+      "leaf_hashes_b64": [
+        "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg==",
+        "hEbEbuA3k7puWBO6DbRIAAiSbdHRnv4sjrkvkDTal00hca5IPynOOnntT91iGuHtFP4SUyr5Xd0HKHec5aqELQ==",
+        "v+TX9zdxFtwV95TZAmIXl7crMjljgt4rbknU8dfqvf3c/DvBJ7tn+S+UWKVzO7IYBOfM1WtLb4EEkzn0d80nnQ=="
+      ],
+      "leaf_inputs": [
+        "a",
+        "b",
+        "c"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_four_leaves",
+      "expected_root_b64": "SolSpurTLIi+/Bz9krrQB72t+zyI/8+kMno2lZ6Uhj1aHleUi7Sk9kQGPbY4wIvfbdOcAdlPVdff9FlZVy/5kw==",
+      "leaf_hashes_b64": [
+        "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg==",
+        "hEbEbuA3k7puWBO6DbRIAAiSbdHRnv4sjrkvkDTal00hca5IPynOOnntT91iGuHtFP4SUyr5Xd0HKHec5aqELQ==",
+        "v+TX9zdxFtwV95TZAmIXl7crMjljgt4rbknU8dfqvf3c/DvBJ7tn+S+UWKVzO7IYBOfM1WtLb4EEkzn0d80nnQ==",
+        "RmiJdoLM0rHuDK6NxVlHKR+BnMWe4Sb1vSQ7GFJXdBRBOu7VeAtfsRCQA4cVvu0bAHFKFbMcjZZ0+9vff9QZHA=="
+      ],
+      "leaf_inputs": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_five_leaves_dup",
+      "expected_root_b64": "9Z4Y6DGeu329QjXteTvvwkD28zVgw2ua3hv2yhR1Nr1m2GeWzmfVeD5ZAMm1/69CwVmABwnH0HlpXPPfMZiiDw==",
+      "leaf_hashes_b64": [
+        "aX8thWFyy4MJ1ri5faxN40S1SdTe5h7ftJYthpi3+oA/T5P/JDk1huKLW5V6w9HTaUIM5TMycS+Ze9M20JqwKg==",
+        "hEbEbuA3k7puWBO6DbRIAAiSbdHRnv4sjrkvkDTal00hca5IPynOOnntT91iGuHtFP4SUyr5Xd0HKHec5aqELQ==",
+        "v+TX9zdxFtwV95TZAmIXl7crMjljgt4rbknU8dfqvf3c/DvBJ7tn+S+UWKVzO7IYBOfM1WtLb4EEkzn0d80nnQ==",
+        "RmiJdoLM0rHuDK6NxVlHKR+BnMWe4Sb1vSQ7GFJXdBRBOu7VeAtfsRCQA4cVvu0bAHFKFbMcjZZ0+9vff9QZHA==",
+        "bruKc7/QRZvVdbnb723LlwuxEYJZH17NfIwNdxsyabcV/LhABdVC/3QwZWWkazuJP2TKQbhRlFeuE39kKd+7Hg=="
+      ],
+      "leaf_inputs": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    },
+    {
+      "case": "merkle_identical_leaves",
+      "expected_root_b64": "EsSy/bWpdYCenkmeKLHGVzlTOAu8uVG+5riu9jZJagYMfcR2VTFOqxSqoWv3Y7NUhqarALpEWCeUpkZ8JfENIw==",
+      "leaf_hashes_b64": [
+        "D9snlgMIxRRn7dSaD14MQ0ycynIfTDW/8AX+q69gEOd3oRN+6Bh8UoivV1eNGNUCoLvkwCL1WHVBlh4QEy2YNA==",
+        "D9snlgMIxRRn7dSaD14MQ0ycynIfTDW/8AX+q69gEOd3oRN+6Bh8UoivV1eNGNUCoLvkwCL1WHVBlh4QEy2YNA==",
+        "D9snlgMIxRRn7dSaD14MQ0ycynIfTDW/8AX+q69gEOd3oRN+6Bh8UoivV1eNGNUCoLvkwCL1WHVBlh4QEy2YNA==",
+        "D9snlgMIxRRn7dSaD14MQ0ycynIfTDW/8AX+q69gEOd3oRN+6Bh8UoivV1eNGNUCoLvkwCL1WHVBlh4QEy2YNA=="
+      ],
+      "leaf_inputs": [
+        "x",
+        "x",
+        "x",
+        "x"
+      ],
+      "rule": "pairwise hash; duplicate last when odd; sha3-512"
+    }
+  ],
+  "ordering": {
+    "default": "seq_asc",
+    "note": "ordering is applied before leaf extraction"
+  },
+  "version": "v0.1.7"
+}

@@ -1,0 +1,68 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/bench-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "generated_at": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "windows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "cc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "ef": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "end_us": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "pf": {
+            "type": "number"
+          },
+          "start_us": {
+            "type": "integer"
+          },
+          "stream_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "stream_id",
+          "start_us",
+          "end_us",
+          "pf",
+          "cc",
+          "ef"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "run_id",
+    "generated_at",
+    "profile_id",
+    "windows"
+  ],
+  "title": "VectorForge Benchmark Report Schema",
+  "type": "object"
+}

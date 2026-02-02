@@ -1,0 +1,218 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.7/rfvector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "rf": {
+      "additionalProperties": false,
+      "properties": {
+        "band": {
+          "additionalProperties": false,
+          "properties": {
+            "center_hz": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "span_hz": {
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "center_hz",
+            "span_hz"
+          ],
+          "type": "object"
+        },
+        "detections": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "duration_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "emitter_hint": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "fingerprints": {
+          "items": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "wavelet_fingerprint_v1"
+                  },
+                  "matrix": {
+                    "items": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "type": "array"
+                    },
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "type": "array"
+                  },
+                  "params": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "decomp_level": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "normalized": {
+                        "type": "boolean"
+                      },
+                      "wavelet": {
+                        "type": "string"
+                      },
+                      "window_ms": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "window_ms",
+                      "wavelet",
+                      "decomp_level",
+                      "normalized"
+                    ],
+                    "type": "object"
+                  },
+                  "scale": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "scale",
+                  "matrix",
+                  "params"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "codec": {
+                    "type": "string"
+                  },
+                  "data_b64": {
+                    "type": "string"
+                  },
+                  "df_hz": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "dt_us": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "f0_hz": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "const": "spectral_tile_v1"
+                  },
+                  "quant": {
+                    "type": "object"
+                  },
+                  "shape": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "f": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "t": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "t",
+                      "f"
+                    ],
+                    "type": "object"
+                  },
+                  "t0_us": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "t0_us",
+                  "dt_us",
+                  "f0_hz",
+                  "df_hz",
+                  "shape",
+                  "codec",
+                  "data_b64"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "dim": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "const": "embedding_v1"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "vector_b64": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "model",
+                  "dim",
+                  "vector_b64"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "sample_rate_hz": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "session_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "band",
+        "sample_rate_hz",
+        "duration_ms",
+        "fingerprints"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "rf"
+  ],
+  "title": "RFVector Payload Schema (v0.1.7 baseline)",
+  "type": "object"
+}
