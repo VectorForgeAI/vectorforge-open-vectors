@@ -58,7 +58,7 @@ Each Vector provides:
 - **Fidelity**: Measurable context preservation (not bitwise reconstruction)
 - **Continuity**: Confidence that a record stream is complete for a time window
 
-See [docs/concepts/](docs/concepts/) for detailed explanations.
+See [docs/concepts/](docs/concepts/) for detailed explanations, or the [Glossary](docs/glossary.md) for quick definitions.
 
 ## Conformance Levels
 
