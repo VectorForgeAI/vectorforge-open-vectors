@@ -45,7 +45,7 @@ def make_divt_for_record(record_obj: dict, tenant_id: str) -> dict:
         "tenant_id": tenant_id,
         "hash_b64": hash_b64,
         "hash_mode": "json_canon_v1",
-        "hash_version": "1",
+        "hash_version": "sha3-512-v1",
         "crypto_mode": "hybrid",
         "signatures": {
             "key_ver": "v1",
