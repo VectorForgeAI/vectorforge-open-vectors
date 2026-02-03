@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/header-banner.png" alt="VectorForge Open Vectors - Verifiable, vendor-neutral telemetry encoding" width="100%">
+</p>
+
 # VectorForge Open Vectors
 
 **VectorForge Open Vectors** defines how to encode raw telemetry into small, verifiable records with measurable fidelity and completeness, independent of any proprietary compression.
