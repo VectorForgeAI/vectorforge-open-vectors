@@ -1,129 +1,448 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/pulsevector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/pulsevector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PulseVector Payload Schema (v0.2.0)",
+  "type": "object",
   "additionalProperties": false,
+  "required": ["pulse"],
   "properties": {
     "pulse": {
       "oneOf": [
         {
+          "type": "object",
           "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "kind",
+            "flow_id",
+            "tuple",
+            "timing",
+            "stats",
+            "classification"
+          ],
           "properties": {
-            "dns": {
-              "type": "object"
-            },
-            "extensions": {
-              "type": "object"
-            },
-            "flow_id": {
-              "type": "string"
-            },
-            "http": {
-              "type": "object"
+            "schema_version": {
+              "type": "string",
+              "const": "0.2.0"
             },
             "kind": {
               "const": "flow_slice_v1"
             },
-            "stats": {
+            "flow_id": {
+              "type": "string"
+            },
+            "tuple": {
+              "type": "object",
               "additionalProperties": false,
+              "required": [
+                "src_ip",
+                "src_port",
+                "dst_ip",
+                "dst_port",
+                "proto",
+                "ip_version"
+              ],
               "properties": {
-                "bytes_in": {
+                "src_ip": {
+                  "type": "string"
+                },
+                "src_port": {
+                  "type": "integer",
                   "minimum": 0,
+                  "maximum": 65535
+                },
+                "dst_ip": {
+                  "type": "string"
+                },
+                "dst_port": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "proto": {
                   "type": "integer"
                 },
-                "bytes_out": {
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "packets_in": {
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "packets_out": {
-                  "minimum": 0,
-                  "type": "integer"
+                "ip_version": {
+                  "type": "integer",
+                  "enum": [4, 6]
                 }
-              },
+              }
+            },
+            "timing": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "first_seen_us",
+                "last_seen_us",
+                "duration_us"
+              ],
+              "properties": {
+                "first_seen_us": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "last_seen_us": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "duration_us": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "stats": {
+              "type": "object",
+              "additionalProperties": false,
               "required": [
                 "bytes_out",
                 "bytes_in",
                 "packets_out",
                 "packets_in"
               ],
-              "type": "object"
+              "properties": {
+                "bytes_out": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "bytes_in": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "packets_out": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "packets_in": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "retransmits": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "rst_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "fin_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "syn_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
             },
             "tls": {
-              "type": "object"
-            },
-            "tuple": {
-              "additionalProperties": false,
-              "properties": {
-                "dst_ip": {
-                  "type": "string"
-                },
-                "dst_port": {
-                  "type": "integer"
-                },
-                "proto": {
-                  "type": "string"
-                },
-                "src_ip": {
-                  "type": "string"
-                },
-                "src_port": {
-                  "type": "integer"
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "version",
+                    "cipher_suite",
+                    "cipher_suite_id"
+                  ],
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "enum": ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3"]
+                    },
+                    "sni": {
+                      "type": ["string", "null"]
+                    },
+                    "cipher_suite": {
+                      "type": "string"
+                    },
+                    "cipher_suite_id": {
+                      "type": "integer"
+                    },
+                    "extensions_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "alpn": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "cert_chain": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "subject_cn",
+                          "issuer_cn",
+                          "serial",
+                          "not_before",
+                          "not_after",
+                          "fingerprint_sha256"
+                        ],
+                        "properties": {
+                          "subject_cn": { "type": "string" },
+                          "issuer_cn": { "type": "string" },
+                          "serial": { "type": "string" },
+                          "not_before": { "type": "string", "format": "date-time" },
+                          "not_after": { "type": "string", "format": "date-time" },
+                          "san": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "fingerprint_sha256": { "type": "string" }
+                        }
+                      }
+                    },
+                    "handshake_duration_us": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "resumed": {
+                      "type": "boolean"
+                    }
+                  }
                 }
-              },
-              "required": [
-                "src_ip",
-                "src_port",
-                "dst_ip",
-                "dst_port",
-                "proto"
-              ],
-              "type": "object"
-            }
-          },
-          "required": [
-            "kind",
-            "flow_id",
-            "tuple",
-            "stats"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "attributes": {
-              "type": "object"
+              ]
             },
-            "event_type": {
-              "type": "string"
+            "dns": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "query_name",
+                    "query_type",
+                    "query_class"
+                  ],
+                  "properties": {
+                    "query_name": { "type": "string" },
+                    "query_type": { "type": "string" },
+                    "query_class": { "type": "string" },
+                    "response_code": { "type": ["string", "null"] },
+                    "answers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["name", "type", "ttl", "data"],
+                        "properties": {
+                          "name": { "type": "string" },
+                          "type": { "type": "string" },
+                          "ttl": { "type": "integer", "minimum": 0 },
+                          "data": { "type": "string" }
+                        }
+                      }
+                    },
+                    "authority_count": { "type": "integer", "minimum": 0 },
+                    "additional_count": { "type": "integer", "minimum": 0 },
+                    "response_time_us": { "type": "integer", "minimum": 0 },
+                    "is_dnssec": { "type": "boolean" },
+                    "is_recursive": { "type": "boolean" }
+                  }
+                }
+              ]
+            },
+            "http": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "method",
+                    "uri",
+                    "host"
+                  ],
+                  "properties": {
+                    "method": { "type": "string" },
+                    "uri": { "type": "string" },
+                    "host": { "type": "string" },
+                    "status_code": { "type": ["integer", "null"] },
+                    "request_content_length": { "type": "integer", "minimum": 0 },
+                    "response_content_length": { "type": "integer", "minimum": 0 },
+                    "content_type": { "type": "string" },
+                    "user_agent_hash": { "type": "string" },
+                    "referrer_domain": { "type": ["string", "null"] },
+                    "version": {
+                      "type": "string",
+                      "enum": ["HTTP/1.0", "HTTP/1.1", "HTTP/2", "HTTP/3"]
+                    }
+                  }
+                }
+              ]
+            },
+            "fingerprints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "type": "string" },
+                  "hash": { "type": "string" },
+                  "raw_string": { "type": "string" },
+                  "scale": { "type": "integer" },
+                  "matrix": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": { "type": "integer" }
+                    }
+                  },
+                  "query_entropy": { "type": "number" },
+                  "label_count": { "type": "integer" },
+                  "max_label_length": { "type": "integer" },
+                  "has_numeric_labels": { "type": "boolean" },
+                  "query_length": { "type": "integer" },
+                  "unique_query_types": { "type": "integer" },
+                  "subject_cn": { "type": "string" },
+                  "issuer_cn": { "type": "string" },
+                  "valid_days_remaining": { "type": "integer" },
+                  "params": { "type": "object" }
+                }
+              }
+            },
+            "classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "traffic_type",
+                "confidence",
+                "model"
+              ],
+              "properties": {
+                "traffic_type": { "type": "string" },
+                "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+                "model": { "type": "string" }
+              }
+            },
+            "entity_id": {
+              "type": ["string", "null"]
+            },
+            "correlation": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_refs": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "method": { "type": ["string", "null"] },
+                    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+                    "baseline_ref": { "type": ["string", "null"] },
+                    "deviation_flags": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              ]
+            },
+            "session_id": {
+              "type": ["string", "null"]
             },
             "extensions": {
               "type": "object"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "kind",
+            "event_type",
+            "occurred_us",
+            "severity",
+            "attributes"
+          ],
+          "properties": {
+            "schema_version": {
+              "type": "string",
+              "const": "0.2.0"
             },
             "kind": {
               "const": "net_event_v1"
             },
+            "event_type": {
+              "type": "string"
+            },
             "occurred_us": {
-              "minimum": 0,
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["info", "low", "medium", "high", "critical"]
+            },
+            "attributes": {
+              "type": "object"
+            },
+            "fingerprints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "type": "string" },
+                  "params": { "type": "object" }
+                }
+              }
+            },
+            "classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "traffic_type",
+                "confidence",
+                "model"
+              ],
+              "properties": {
+                "traffic_type": { "type": "string" },
+                "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+                "model": { "type": "string" }
+              }
+            },
+            "entity_id": {
+              "type": ["string", "null"]
+            },
+            "correlation": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_refs": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "method": { "type": ["string", "null"] },
+                    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+                    "baseline_ref": { "type": ["string", "null"] },
+                    "deviation_flags": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              ]
+            },
+            "session_id": {
+              "type": ["string", "null"]
+            },
+            "extensions": {
+              "type": "object"
             }
-          },
-          "required": [
-            "kind",
-            "event_type",
-            "occurred_us"
-          ],
-          "type": "object"
+          }
         }
       ]
     }
-  },
-  "required": [
-    "pulse"
-  ],
-  "title": "PulseVector Payload Schema (v0.1.7 baseline)",
-  "type": "object"
+  }
 }
