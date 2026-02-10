@@ -204,9 +204,9 @@ Measures detection agreement:
 | wavelet decomp_level ↑ | Richer fingerprint | Larger matrix |
 | detection confidence ↓ | More detections | More noise |
 
-## Migration from rf-transformer
+## Migration from rfvector-plugin (formerly rf-transformer)
 
-If you have existing `rf-transformer` output, see [Migration Guide](../migration/rf-parser-mapping.md) for field-by-field mapping.
+If you have existing `rfvector-plugin` output (formerly `rf-transformer`), see [Migration Guide](../migration/rf-parser-mapping.md) for field-by-field mapping.
 
 ## Schema
 

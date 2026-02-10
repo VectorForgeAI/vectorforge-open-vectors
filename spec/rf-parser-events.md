@@ -1,5 +1,7 @@
 # RF Parser Event Schemas (Interim, implementation-facing)
 
+> **Note:** The `rf-transformer` plugin has been renamed to `rfvector-plugin` in v0.2.0.
+
 This document captures current RF parser outputs so implementers can build ingestion and mapping logic before the full RFVector payload schema tightens further.
 
 Source parsers:

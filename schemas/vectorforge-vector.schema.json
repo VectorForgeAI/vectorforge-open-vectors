@@ -1,5 +1,5 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/vectorforge-vector.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/vectorforge-vector.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -188,6 +188,6 @@
     "record",
     "divt"
   ],
-  "title": "VectorForge Vector Record Schema",
+  "title": "VectorForge Vector Record Schema (v0.2.0)",
   "type": "object"
 }

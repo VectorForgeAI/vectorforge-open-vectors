@@ -1,5 +1,5 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/rfvector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/rfvector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -24,20 +24,165 @@
           ],
           "type": "object"
         },
-        "detections": {
-          "items": {
-            "type": "object"
-          },
-          "type": "array"
+        "sample_rate_hz": {
+          "minimum": 1,
+          "type": "integer"
         },
         "duration_ms": {
           "minimum": 1,
           "type": "integer"
         },
-        "emitter_hint": {
-          "type": "string"
+        "spectral_measurements": {
+          "additionalProperties": false,
+          "properties": {
+            "peak_power_dBm_x100": {
+              "type": "integer",
+              "description": "Peak power in dBm * 100 (fixed-point, e.g. -3050 = -30.50 dBm)"
+            },
+            "mean_power_dBm_x100": {
+              "type": "integer",
+              "description": "Mean power in dBm * 100 (fixed-point)"
+            },
+            "noise_floor_dBm_x100": {
+              "type": "integer",
+              "description": "Noise floor in dBm * 100 (fixed-point)"
+            },
+            "snr_dB_x100": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Signal-to-noise ratio in dB * 100 (fixed-point)"
+            },
+            "flatness_x10000": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000,
+              "description": "Spectral flatness ratio * 10000 (0 = tonal, 10000 = white noise)"
+            },
+            "variance_x10000": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Spectral variance * 10000 (fixed-point)"
+            },
+            "peak_to_average_dB_x100": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Peak-to-average power ratio in dB * 100"
+            }
+          },
+          "required": [
+            "peak_power_dBm_x100",
+            "mean_power_dBm_x100",
+            "noise_floor_dBm_x100",
+            "snr_dB_x100"
+          ],
+          "type": "object"
         },
-        "extensions": {
+        "location": {
+          "additionalProperties": false,
+          "properties": {
+            "lat_udeg": {
+              "type": "integer",
+              "description": "Latitude in microdegrees (e.g. 37774929 = 37.774929°)"
+            },
+            "lon_udeg": {
+              "type": "integer",
+              "description": "Longitude in microdegrees"
+            },
+            "alt_mm": {
+              "type": "integer",
+              "description": "Altitude above WGS84 ellipsoid in millimetres"
+            },
+            "accuracy_mm": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Horizontal accuracy radius in millimetres"
+            },
+            "bearing_mdeg": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360000,
+              "description": "Antenna bearing in millidegrees (0-360000)"
+            },
+            "aoa_mdeg": {
+              "type": "integer",
+              "description": "Angle of arrival in millidegrees"
+            }
+          },
+          "required": [
+            "lat_udeg",
+            "lon_udeg"
+          ],
+          "type": "object"
+        },
+        "classification": {
+          "additionalProperties": false,
+          "properties": {
+            "signal_type": {
+              "type": "string",
+              "description": "Classified signal type (e.g. 'wifi', 'lte', 'fm_broadcast', 'unknown')"
+            },
+            "confidence_pct": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Classification confidence as integer percentage (0-100)"
+            },
+            "model": {
+              "type": "string",
+              "description": "Classification model identifier"
+            }
+          },
+          "required": [
+            "signal_type",
+            "confidence_pct",
+            "model"
+          ],
+          "type": "object"
+        },
+        "entity_id": {
+          "type": "string",
+          "description": "Correlated entity identifier linking captures from the same emitter"
+        },
+        "correlation": {
+          "additionalProperties": false,
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "Correlation method used (e.g. 'fingerprint_match', 'manual')"
+            },
+            "entity_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "description": "Related entity identifiers"
+            },
+            "confidence_pct": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "method"
+          ],
+          "type": "object"
+        },
+        "hardware": {
+          "additionalProperties": false,
+          "properties": {
+            "antenna_model": {
+              "type": "string"
+            },
+            "gain_dB_x100": {
+              "type": "integer",
+              "description": "Antenna gain in dB * 100 (fixed-point)"
+            },
+            "receiver": {
+              "type": "string",
+              "description": "Receiver model identifier"
+            }
+          },
           "type": "object"
         },
         "fingerprints": {
@@ -193,12 +338,20 @@
           "minItems": 1,
           "type": "array"
         },
-        "sample_rate_hz": {
-          "minimum": 1,
-          "type": "integer"
+        "detections": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "emitter_hint": {
+          "type": "string"
         },
         "session_id": {
           "type": "string"
+        },
+        "extensions": {
+          "type": "object"
         }
       },
       "required": [
@@ -213,6 +366,6 @@
   "required": [
     "rf"
   ],
-  "title": "RFVector Payload Schema (v0.1.7 baseline)",
+  "title": "RFVector Payload Schema (v0.2.0)",
   "type": "object"
 }

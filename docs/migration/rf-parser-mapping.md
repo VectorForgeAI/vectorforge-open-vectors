@@ -1,5 +1,7 @@
 # Migration Guide: rf-transformer to RFVector
 
+> **Note:** The `rf-transformer` plugin has been renamed to `rfvector-plugin` as of v0.2.0. This guide covers migrating from the legacy rf-transformer output format.
+
 This guide shows how to map existing `rf-transformer` parser output (`RFCaptureEvent`, schema v1.1.0) to the RFVector record format.
 
 ## Overview
@@ -192,8 +194,8 @@ Fields you need to add (not present in rf-transformer output):
       "source_id": "sensor-01",
       "source_type": "rf_sensor",
       "labels": {
-        "plugin_id": "rf-transformer",
-        "plugin_version": "1.1.0"
+        "plugin_id": "rfvector-plugin",
+        "plugin_version": "0.2.0"
       }
     },
     "chain": {
@@ -262,4 +264,4 @@ VITA49-specific fields map to:
 ## See Also
 
 - [RFVector Documentation](../vectors/rfvector.md)
-- [rf-parser-events.md](../../spec/rf-parser-events.md) - Full rf-transformer schema
+- [rf-parser-events.md](../../spec/rf-parser-events.md) - Legacy rf-transformer event schema

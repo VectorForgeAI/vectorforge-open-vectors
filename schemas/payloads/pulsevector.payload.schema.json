@@ -1,5 +1,5 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/pulsevector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/pulsevector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -8,29 +8,82 @@
         {
           "additionalProperties": false,
           "properties": {
-            "dns": {
-              "type": "object"
-            },
-            "extensions": {
-              "type": "object"
+            "kind": {
+              "const": "flow_slice_v1"
             },
             "flow_id": {
               "type": "string"
             },
-            "http": {
+            "tuple": {
+              "additionalProperties": false,
+              "properties": {
+                "src_ip": {
+                  "type": "string"
+                },
+                "src_port": {
+                  "type": "integer"
+                },
+                "dst_ip": {
+                  "type": "string"
+                },
+                "dst_port": {
+                  "type": "integer"
+                },
+                "proto": {
+                  "type": "string"
+                },
+                "ip_version": {
+                  "type": "integer",
+                  "enum": [4, 6]
+                }
+              },
+              "required": [
+                "src_ip",
+                "src_port",
+                "dst_ip",
+                "dst_port",
+                "proto"
+              ],
               "type": "object"
             },
-            "kind": {
-              "const": "flow_slice_v1"
+            "timing": {
+              "additionalProperties": false,
+              "properties": {
+                "first_seen_us": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Microsecond epoch timestamp of the first packet"
+                },
+                "last_seen_us": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Microsecond epoch timestamp of the last packet"
+                },
+                "duration_us": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Flow duration in microseconds"
+                }
+              },
+              "required": [
+                "first_seen_us",
+                "last_seen_us",
+                "duration_us"
+              ],
+              "type": "object"
             },
             "stats": {
               "additionalProperties": false,
               "properties": {
+                "bytes_out": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
                 "bytes_in": {
                   "minimum": 0,
                   "type": "integer"
                 },
-                "bytes_out": {
+                "packets_out": {
                   "minimum": 0,
                   "type": "integer"
                 },
@@ -38,7 +91,19 @@
                   "minimum": 0,
                   "type": "integer"
                 },
-                "packets_out": {
+                "retransmits": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "rst_count": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "fin_count": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "syn_count": {
                   "minimum": 0,
                   "type": "integer"
                 }
@@ -52,34 +117,173 @@
               "type": "object"
             },
             "tls": {
-              "type": "object"
-            },
-            "tuple": {
               "additionalProperties": false,
               "properties": {
-                "dst_ip": {
+                "version": {
+                  "type": "string",
+                  "description": "TLS version (e.g. 'TLS 1.3', 'TLS 1.2')"
+                },
+                "cipher_suite": {
                   "type": "string"
                 },
-                "dst_port": {
-                  "type": "integer"
+                "sni": {
+                  "type": "string",
+                  "description": "Server Name Indication value"
                 },
-                "proto": {
+                "issuer": {
                   "type": "string"
                 },
-                "src_ip": {
+                "subject": {
                   "type": "string"
                 },
-                "src_port": {
-                  "type": "integer"
+                "cert_fingerprint_sha256": {
+                  "type": "string",
+                  "description": "SHA-256 fingerprint of the server certificate"
+                },
+                "extensions": {
+                  "type": "object"
                 }
               },
-              "required": [
-                "src_ip",
-                "src_port",
-                "dst_ip",
-                "dst_port",
-                "proto"
-              ],
+              "type": "object"
+            },
+            "dns": {
+              "additionalProperties": false,
+              "properties": {
+                "query_name": {
+                  "type": "string"
+                },
+                "query_type": {
+                  "type": "string",
+                  "description": "DNS record type (e.g. 'A', 'AAAA', 'CNAME', 'MX')"
+                },
+                "response_code": {
+                  "type": "string",
+                  "description": "DNS response code (e.g. 'NOERROR', 'NXDOMAIN')"
+                },
+                "answers": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "ttl": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": ["type", "value"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "extensions": {
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "http": {
+              "additionalProperties": false,
+              "properties": {
+                "method": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "user_agent": {
+                  "type": "string"
+                },
+                "content_type": {
+                  "type": "string"
+                },
+                "extensions": {
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "fingerprints": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "description": "Fingerprint type (e.g. 'ja3', 'ja3s', 'ja4', 'hassh', 'flow_behavior', 'dns_pattern', 'cert_fingerprint')"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Fingerprint hash or value"
+                  },
+                  "raw": {
+                    "type": "string",
+                    "description": "Raw fingerprint string before hashing (optional)"
+                  }
+                },
+                "required": ["kind", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "classification": {
+              "additionalProperties": false,
+              "properties": {
+                "traffic_type": {
+                  "type": "string",
+                  "description": "Classified traffic type (e.g. 'web_browsing', 'dns', 'streaming', 'unknown')"
+                },
+                "confidence_pct": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Classification confidence as integer percentage"
+                },
+                "model": {
+                  "type": "string"
+                }
+              },
+              "required": ["traffic_type", "confidence_pct", "model"],
+              "type": "object"
+            },
+            "entity_id": {
+              "type": ["string", "null"],
+              "description": "Correlated entity identifier"
+            },
+            "correlation": {
+              "additionalProperties": false,
+              "properties": {
+                "method": {
+                  "type": "string"
+                },
+                "entity_ids": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "confidence_pct": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": ["method"],
+              "type": ["object", "null"]
+            },
+            "session_id": {
+              "type": "string"
+            },
+            "extensions": {
               "type": "object"
             }
           },
@@ -87,6 +291,7 @@
             "kind",
             "flow_id",
             "tuple",
+            "timing",
             "stats"
           ],
           "type": "object"
@@ -94,21 +299,47 @@
         {
           "additionalProperties": false,
           "properties": {
-            "attributes": {
-              "type": "object"
+            "kind": {
+              "const": "net_event_v1"
             },
             "event_type": {
               "type": "string"
             },
-            "extensions": {
-              "type": "object"
-            },
-            "kind": {
-              "const": "net_event_v1"
-            },
             "occurred_us": {
               "minimum": 0,
               "type": "integer"
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["info", "warning", "error", "critical"]
+            },
+            "attributes": {
+              "type": "object"
+            },
+            "fingerprints": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "raw": {
+                    "type": "string"
+                  }
+                },
+                "required": ["kind", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "session_id": {
+              "type": "string"
+            },
+            "extensions": {
+              "type": "object"
             }
           },
           "required": [
@@ -124,6 +355,6 @@
   "required": [
     "pulse"
   ],
-  "title": "PulseVector Payload Schema (v0.1.7 baseline)",
+  "title": "PulseVector Payload Schema (v0.2.0)",
   "type": "object"
 }

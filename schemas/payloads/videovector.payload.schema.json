@@ -1,43 +1,333 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/videovector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/videovector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "video": {
       "additionalProperties": false,
       "properties": {
-        "events": {
-          "items": {
-            "type": "object"
-          },
-          "type": "array"
-        },
-        "extensions": {
-          "type": "object"
-        },
-        "keyframes": {
-          "items": {
-            "type": "object"
-          },
-          "type": "array"
-        },
         "kind": {
           "enum": [
             "video_segment_v1",
             "video_event_v1"
           ]
         },
-        "motion": {
+        "stream": {
+          "additionalProperties": false,
+          "properties": {
+            "codec": {
+              "type": "string",
+              "description": "Video codec name (e.g. 'h264', 'h265', 'vp9')"
+            },
+            "codec_profile": {
+              "type": "string"
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "fps_x1000": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Frames per second * 1000 (fixed-point, e.g. 29970 = 29.97 fps)"
+            },
+            "bitrate_kbps": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "color_space": {
+              "type": "string"
+            },
+            "gop_size": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "total_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Segment duration in milliseconds"
+            },
+            "device": {
+              "additionalProperties": false,
+              "properties": {
+                "make": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "creation_time": {
+                  "type": "string",
+                  "description": "ISO 8601 creation timestamp from container metadata"
+                }
+              },
+              "type": "object"
+            },
+            "camera_intrinsics": {
+              "additionalProperties": false,
+              "properties": {
+                "fov_horizontal_mdeg": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Horizontal field of view in millidegrees"
+                },
+                "focal_length_um": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Focal length in micrometres"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "codec",
+            "width",
+            "height",
+            "fps_x1000"
+          ],
           "type": "object"
         },
-        "stream": {
+        "keyframes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "frame_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "pts_us": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Presentation timestamp in microseconds"
+              },
+              "phash_hex": {
+                "type": "string",
+                "description": "Perceptual hash as hex string"
+              },
+              "dhash_hex": {
+                "type": "string",
+                "description": "Difference hash as hex string"
+              },
+              "color_histogram": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array",
+                "description": "Quantized color histogram (integer bins)"
+              },
+              "dominant_colors": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "rgb": {
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                      },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "type": "array"
+                    },
+                    "weight_pct": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": ["rgb", "weight_pct"],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "mean_brightness": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              }
+            },
+            "required": [
+              "frame_index",
+              "pts_us"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "motion": {
+          "additionalProperties": false,
+          "properties": {
+            "mean_magnitude_x1000": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Mean optical flow magnitude * 1000 (fixed-point)"
+            },
+            "max_magnitude_x1000": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scene_change_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scene_change_frames": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array",
+              "description": "Frame indices where scene changes were detected"
+            },
+            "centroid_x_pct": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Motion centroid X as percentage of frame width"
+            },
+            "centroid_y_pct": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Motion centroid Y as percentage of frame height"
+            }
+          },
+          "type": "object"
+        },
+        "quality": {
+          "additionalProperties": false,
+          "properties": {
+            "blur_score_x1000": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Laplacian variance blur metric * 1000"
+            },
+            "noise_score_x1000": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "pts_gap_count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of PTS discontinuities detected"
+            },
+            "max_pts_gap_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Largest PTS gap in milliseconds"
+            },
+            "gop_regularity_pct": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "GOP regularity as integer percentage"
+            }
+          },
           "type": "object"
         },
         "tracks": {
           "items": {
+            "additionalProperties": false,
+            "properties": {
+              "track_id": {
+                "type": "string"
+              },
+              "object_class": {
+                "type": "string"
+              },
+              "confidence_pct": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "first_frame": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "last_frame": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bbox_count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": ["track_id", "object_class"],
             "type": "object"
           },
           "type": "array"
+        },
+        "events": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "description": "Event type (e.g. 'scene_change', 'motion_spike', 'object_enter')"
+              },
+              "frame_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "pts_us": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "confidence_pct": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "attributes": {
+                "type": "object"
+              }
+            },
+            "required": ["event_type", "frame_index"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "thumbnail_tile": {
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "type": "string",
+              "description": "Image format (e.g. 'jpeg', 'webp')"
+            },
+            "columns": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "thumb_width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "thumb_height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "data_b64": {
+              "type": "string",
+              "description": "Base64-encoded thumbnail tile image"
+            }
+          },
+          "required": ["format", "columns", "rows", "thumb_width", "thumb_height", "data_b64"],
+          "type": "object"
+        },
+        "extensions": {
+          "type": "object"
         }
       },
       "required": [
@@ -50,6 +340,6 @@
   "required": [
     "video"
   ],
-  "title": "VideoVector Payload Schema (v0.1.7 baseline)",
+  "title": "VideoVector Payload Schema (v0.2.0)",
   "type": "object"
 }
