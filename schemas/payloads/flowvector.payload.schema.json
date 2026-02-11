@@ -1,31 +1,52 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/flowvector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/flowvector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "flow": {
       "additionalProperties": false,
       "properties": {
-        "actors": {
-          "type": "object"
+        "kind": {
+          "enum": ["content_item_v1", "content_error_v1"],
+          "type": "string"
+        },
+        "item_id": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "fetched_us": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "published_us": {
+          "minimum": 0,
+          "type": "integer"
         },
         "content": {
           "additionalProperties": false,
           "properties": {
-            "lang": {
-              "type": "string"
-            },
             "mime": {
               "type": "string"
             },
             "text": {
               "type": "string"
             },
+            "title": {
+              "type": "string"
+            },
+            "lang": {
+              "type": "string"
+            },
             "text_sha3_512_b64": {
               "type": "string"
             },
-            "title": {
-              "type": "string"
+            "byte_count": {
+              "type": "integer"
+            },
+            "word_count": {
+              "type": "integer"
             }
           },
           "required": [
@@ -33,11 +54,167 @@
           ],
           "type": "object"
         },
-        "extensions": {
+        "author": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "handle": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "platform": {
+              "type": "string"
+            }
+          },
           "type": "object"
         },
-        "kind": {
-          "const": "content_item_v1"
+        "source": {
+          "additionalProperties": false,
+          "properties": {
+            "domain": {
+              "type": "string"
+            },
+            "feed_url": {
+              "type": "string"
+            },
+            "platform": {
+              "type": "string"
+            },
+            "collection_id": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "entities": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "span": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "confidence_pct": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "embeddings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "model": {
+                "type": "string"
+              },
+              "dim": {
+                "type": "integer"
+              },
+              "vector_b64": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "dim",
+              "vector_b64"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "dedup": {
+          "additionalProperties": false,
+          "properties": {
+            "hash": {
+              "type": "string"
+            },
+            "algo": {
+              "type": "string"
+            },
+            "is_duplicate": {
+              "type": "boolean"
+            },
+            "canonical_id": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "classification": {
+          "additionalProperties": false,
+          "properties": {
+            "category": {
+              "type": "string"
+            },
+            "confidence_pct": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "model": {
+              "type": "string"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "sentiment": {
+          "additionalProperties": false,
+          "properties": {
+            "score_pct": {
+              "maximum": 100,
+              "minimum": -100,
+              "type": "integer"
+            },
+            "model": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "correlation": {
+          "additionalProperties": false,
+          "properties": {
+            "parent_item_id": {
+              "type": "string"
+            },
+            "thread_id": {
+              "type": "string"
+            },
+            "reply_to": {
+              "type": "string"
+            },
+            "batch_id": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "links": {
           "items": {
@@ -45,18 +222,19 @@
           },
           "type": "array"
         },
-        "retrieved_us": {
-          "minimum": 0,
-          "type": "integer"
+        "metadata": {
+          "additionalProperties": true,
+          "type": "object"
         },
-        "uri": {
-          "type": "string"
+        "extensions": {
+          "type": "object"
         }
       },
       "required": [
         "kind",
+        "item_id",
         "uri",
-        "retrieved_us",
+        "fetched_us",
         "content"
       ],
       "type": "object"
@@ -65,6 +243,6 @@
   "required": [
     "flow"
   ],
-  "title": "FlowVector Payload Schema (v0.1.7 baseline)",
+  "title": "FlowVector Payload Schema (v0.2.0)",
   "type": "object"
 }

@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **VideoVector payload v0.2.0**: fully typed `stream` block (codec, resolution, fps_x1000, bitrate, device, camera_intrinsics), typed `keyframes[]` with perceptual/difference hashes, color histograms, dominant colors; typed `motion` block (optical flow magnitudes, scene changes, centroid); `quality` metrics (blur, noise, PTS gaps, GOP regularity); typed `tracks[]` and `events[]`; `thumbnail_tile` block
 - **ExchangeVector payload v0.2.0**: `lifecycle_state`, typed `instrument` block (type/network/last_four/token), typed `parties` (payer/payee with id/type/name/institution), typed `fees[]` array (value/asset/fee_type/description), `amount.precision`, `crypto` block (chain/tx_hash/block_number/confirmations/wallet_address), `risk_signals` (score/flags/model), `correlation` block, `metadata` object
 - ExchangeVector example records (card payment, crypto transfer, refund)
+- **FlowVector payload v0.2.0**: `item_id`, typed `author` block (name/handle/url/platform), typed `source` block (domain/feed_url/platform/collection_id), typed `entities[]` (type/value/span/confidence_pct), typed `embeddings[]` (model/dim/vector_b64), `dedup` block (hash/algo/is_duplicate/canonical_id), `classification` block (category/confidence_pct/model/tags), `sentiment` block (score_pct/model), `correlation` block, `content.byte_count`/`content.word_count`, `published_us`, `metadata` object
+- FlowVector example records (web article, social post, RSS feed item)
 - Record envelope schema bumped to v0.2.0 ($id URL updated)
 
 ### Changed
@@ -46,13 +48,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- RFVector, PulseVector, and VideoVector are implementation-ready with comprehensive typed schemas
-- FlowVector remains skeletal (deferred); ExchangeVector is implementation-ready
+- All five vectors (RFVector, PulseVector, VideoVector, ExchangeVector, FlowVector) are implementation-ready
 
 ## [Unreleased]
 
 ### Planned
 
-- FlowVector payload schema v0.2.0
 - Additional CBS extractors for benchmark coverage
 - Extended test vector suites

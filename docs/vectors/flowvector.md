@@ -1,10 +1,10 @@
 # FlowVector
 
-**Status: Spec-first**
+**Status: Reference implementation available**
 
 FlowVector captures high-volume content streams: web scrapes, social feeds, API firehoses, and other content at scale.
 
-> **Note**: This vector is in early specification phase. The schema is skeletal and will be refined as reference producers are built.
+> **Note**: This vector has a reference implementation via the `flowvector-plugin` in DataAnvil-Plugins.
 
 ## Use Cases
 
@@ -21,32 +21,67 @@ FlowVector captures high-volume content streams: web scrapes, social feeds, API 
 | `content_error_v1` | Error during content processing |
 | `manifest_v1` | Continuity Level 2 window manifest (optional) |
 
-## Payload Structure (Draft)
+## Payload Structure (v0.2.0)
 
 ```json
 {
   "payload": {
     "flow": {
       "kind": "content_item_v1",
-      "item_id": "unique-item-identifier",
+      "item_id": "article-2025-0201-001",
       "uri": "https://example.com/article/123",
-      "content_type": "text/html",
       "fetched_us": 1738368000000000,
-      "published_us": 1738367000000000,
-      "text": "Extracted article text...",
-      "title": "Article Title",
-      "author": "Author Name",
-      "metadata": {
-        "source": "example.com",
-        "language": "en",
-        "word_count": 500
+      "published_us": 1738281600000000,
+      "content": {
+        "mime": "text/html",
+        "text": "Extracted article text...",
+        "title": "Article Title",
+        "lang": "en",
+        "byte_count": 24530,
+        "word_count": 3200
+      },
+      "author": {
+        "name": "Dr. Sarah Chen",
+        "handle": "@schen",
+        "url": "https://example.com/authors/sarah-chen",
+        "platform": "web"
+      },
+      "source": {
+        "domain": "example.com",
+        "feed_url": "https://example.com/rss.xml",
+        "platform": "wordpress",
+        "collection_id": "tech-blogs-2025"
       },
       "entities": [
-        {"type": "person", "value": "John Doe", "span": [10, 18]}
+        {"type": "person", "value": "Dr. Sarah Chen", "span": [0, 14], "confidence_pct": 97}
       ],
-      "embeddings": [],
+      "embeddings": [
+        {"model": "all-MiniLM-L6-v2", "dim": 384, "vector_b64": "base64..."}
+      ],
+      "dedup": {
+        "hash": "a1b2c3...",
+        "algo": "sha256",
+        "is_duplicate": false,
+        "canonical_id": "article-2025-0201-001"
+      },
+      "classification": {
+        "category": "technology",
+        "confidence_pct": 95,
+        "model": "topic_classifier_v2",
+        "tags": ["ai", "hardware"]
+      },
+      "sentiment": {
+        "score_pct": 42,
+        "model": "sentiment_v3"
+      },
+      "correlation": {
+        "parent_item_id": "article-2025-0131-042",
+        "thread_id": "ai-hardware-series",
+        "reply_to": "comment-9281",
+        "batch_id": "batch-20250201"
+      },
       "links": ["https://example.com/related"],
-      "dedup_hash": "sha256:...",
+      "metadata": {"http_status": 200},
       "extensions": {}
     }
   }
@@ -56,25 +91,44 @@ FlowVector captures high-volume content streams: web scrapes, social feeds, API 
 ## Key Fields
 
 ### Content Identification
-- **item_id**: Unique identifier for this content item
-- **uri**: Source URL
-- **content_type**: MIME type of original content
+- **item_id**: Unique identifier for this content item (required)
+- **uri**: Source URL (required)
+- **kind**: Record type enum (`content_item_v1`, `content_error_v1`) (required)
 
 ### Timestamps
-- **fetched_us**: When the content was retrieved
-- **published_us**: When the content was originally published (if known)
+- **fetched_us**: When the content was retrieved (required, microseconds)
+- **published_us**: When the content was originally published (optional, microseconds)
 
-### Extracted Content
+### Content Block (required)
+- **mime**: MIME type of original content (required)
 - **text**: Extracted/cleaned text content
 - **title**: Content title
-- **author**: Author attribution
-- **metadata**: Source-specific metadata
+- **lang**: Language code
+- **byte_count**: Size of original content in bytes
+- **word_count**: Word count of extracted text
+- **text_sha3_512_b64**: SHA3-512 hash of text content
+
+### Author Block
+- **name**: Author display name
+- **handle**: Author handle/username
+- **url**: Author profile URL
+- **platform**: Platform identifier
+
+### Source Block
+- **domain**: Source domain
+- **feed_url**: RSS/Atom feed URL
+- **platform**: Platform identifier
+- **collection_id**: Collection or campaign identifier
 
 ### Derived Features
-- **entities**: Extracted named entities
-- **embeddings**: Vector embeddings for similarity/search
+- **entities**: Extracted named entities with type, value, span, and confidence_pct (0-100)
+- **embeddings**: Vector embeddings with model, dim, and vector_b64
+- **dedup**: Deduplication info with hash, algo, is_duplicate flag, canonical_id
+- **classification**: Category, confidence_pct (0-100), model, tags
+- **sentiment**: Sentiment score_pct (-100 to 100), model
+- **correlation**: Parent/thread/reply/batch linking
 - **links**: Outbound links
-- **dedup_hash**: Hash for deduplication
+- **metadata**: Arbitrary key-value metadata
 
 ## Context Basis Set (CBS)
 
@@ -94,7 +148,6 @@ Full schema: `schemas/payloads/flowvector.payload.schema.json`
 ## Contributing
 
 This vector needs:
-- Reference producer implementation
 - CBS extractor implementations
 - Benchmark datasets
 
