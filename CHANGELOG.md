@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **RFVector payload v0.2.0**: `spectral_measurements` block (peak/mean/noise/SNR/flatness/variance/PAPR, all fixed-point integers), `location` block (lat/lon microdegrees, alt mm, accuracy, bearing, AoA), `classification` block, `entity_id`, `correlation` block, `hardware` metadata
 - **PulseVector payload v0.2.0**: `timing` block (first_seen_us, last_seen_us, duration_us), typed `fingerprints[]` array (JA3, JA3S, JA4, HASSH, flow_behavior, dns_pattern, cert_fingerprint), `classification` block, `entity_id`, `correlation` block, `session_id`, `severity` on net_event_v1; fully typed `tls`, `dns`, `http` detail blocks replacing untyped objects
 - **VideoVector payload v0.2.0**: fully typed `stream` block (codec, resolution, fps_x1000, bitrate, device, camera_intrinsics), typed `keyframes[]` with perceptual/difference hashes, color histograms, dominant colors; typed `motion` block (optical flow magnitudes, scene changes, centroid); `quality` metrics (blur, noise, PTS gaps, GOP regularity); typed `tracks[]` and `events[]`; `thumbnail_tile` block
+- **ExchangeVector payload v0.2.0**: `lifecycle_state`, typed `instrument` block (type/network/last_four/token), typed `parties` (payer/payee with id/type/name/institution), typed `fees[]` array (value/asset/fee_type/description), `amount.precision`, `crypto` block (chain/tx_hash/block_number/confirmations/wallet_address), `risk_signals` (score/flags/model), `correlation` block, `metadata` object
+- ExchangeVector example records (card payment, crypto transfer, refund)
 - Record envelope schema bumped to v0.2.0 ($id URL updated)
 
 ### Changed
@@ -45,13 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 
 - RFVector, PulseVector, and VideoVector are implementation-ready with comprehensive typed schemas
-- FlowVector and ExchangeVector remain skeletal (deferred)
+- FlowVector remains skeletal (deferred); ExchangeVector is implementation-ready
 
 ## [Unreleased]
 
 ### Planned
 
 - FlowVector payload schema v0.2.0
-- ExchangeVector payload schema v0.2.0
 - Additional CBS extractors for benchmark coverage
 - Extended test vector suites

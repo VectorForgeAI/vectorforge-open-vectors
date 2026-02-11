@@ -1,62 +1,14 @@
 {
-  "$id": "https://vectorforge.io/schemas/v0.1.7/exchangevector.payload.schema.json",
+  "$id": "https://vectorforge.io/schemas/v0.2.0/exchangevector.payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExchangeVector Payload Schema (v0.2.0)",
+  "type": "object",
   "additionalProperties": false,
+  "required": ["exchange"],
   "properties": {
     "exchange": {
+      "type": "object",
       "additionalProperties": false,
-      "properties": {
-        "amount": {
-          "additionalProperties": false,
-          "properties": {
-            "asset": {
-              "type": "string"
-            },
-            "value": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "value",
-            "asset"
-          ],
-          "type": "object"
-        },
-        "crypto": {
-          "type": "object"
-        },
-        "event_id": {
-          "type": "string"
-        },
-        "event_type": {
-          "type": "string"
-        },
-        "extensions": {
-          "type": "object"
-        },
-        "fees": {
-          "items": {
-            "type": "object"
-          },
-          "type": "array"
-        },
-        "kind": {
-          "const": "transaction_event_v1"
-        },
-        "occurred_us": {
-          "minimum": 0,
-          "type": "integer"
-        },
-        "parties": {
-          "type": "object"
-        },
-        "status": {
-          "type": "string"
-        },
-        "txn_id": {
-          "type": "string"
-        }
-      },
       "required": [
         "kind",
         "txn_id",
@@ -66,12 +18,194 @@
         "amount",
         "status"
       ],
-      "type": "object"
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["transaction_event_v1", "transaction_error_v1"]
+        },
+        "txn_id": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "occurred_us": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "amount": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "asset"],
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "asset": {
+              "type": "string"
+            },
+            "precision": {
+              "type": "integer"
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "lifecycle_state": {
+          "type": "string"
+        },
+        "instrument": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "network": {
+              "type": "string"
+            },
+            "last_four": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            }
+          }
+        },
+        "channel": {
+          "type": "string",
+          "enum": ["online", "pos", "atm", "wire", "ach"]
+        },
+        "parties": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "payer": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "institution": {
+                  "type": "string"
+                }
+              }
+            },
+            "payee": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "institution": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "fees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "asset"],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "asset": {
+                "type": "string"
+              },
+              "fee_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "crypto": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "chain": {
+              "type": "string"
+            },
+            "tx_hash": {
+              "type": "string"
+            },
+            "block_number": {
+              "type": "integer"
+            },
+            "confirmations": {
+              "type": "integer"
+            },
+            "wallet_address": {
+              "type": "string"
+            }
+          }
+        },
+        "risk_signals": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "score": {
+              "type": "integer"
+            },
+            "flags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "model": {
+              "type": "string"
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "correlation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "parent_txn_id": {
+              "type": "string"
+            },
+            "batch_id": {
+              "type": "string"
+            },
+            "reference": {
+              "type": "string"
+            }
+          }
+        },
+        "extensions": {
+          "type": "object"
+        }
+      }
     }
-  },
-  "required": [
-    "exchange"
-  ],
-  "title": "ExchangeVector Payload Schema (v0.1.7 baseline)",
-  "type": "object"
+  }
 }

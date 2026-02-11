@@ -1,10 +1,10 @@
 # ExchangeVector
 
-**Status: Spec-first**
+**Status: Reference implementation available**
 
 ExchangeVector captures financial and digital asset transactions: payments, settlements, ledger events, and transaction lifecycle states.
 
-> **Note**: This vector is in early specification phase. The schema is skeletal and will be refined as reference producers are built.
+> **Note**: This vector has a reference implementation via the `exchangevector-plugin` in DataAnvil-Plugins.
 
 ## Use Cases
 
@@ -129,7 +129,6 @@ Full schema: `schemas/payloads/exchangevector.payload.schema.json`
 ## Contributing
 
 This vector needs:
-- Reference producer implementation
 - CBS extractor implementations
 - Benchmark datasets (synthetic transaction flows)
 
