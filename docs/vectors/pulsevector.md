@@ -1,8 +1,10 @@
 # PulseVector
 
-**Status: Design-ready**
+**Status: Reference implementation available**
 
 PulseVector captures network activity: flow summaries, protocol metadata, and security-relevant events.
+
+> **Note**: This vector has a reference implementation via the `pulsevector-plugin` in DataAnvil-Plugins.
 
 ## Use Cases
 
@@ -37,6 +39,11 @@ PulseVector captures network activity: flow summaries, protocol metadata, and se
         "dst_port": 443,
         "proto": "tcp"
       },
+      "timing": {
+        "first_seen_us": 1738368000000000,
+        "last_seen_us": 1738368001000000,
+        "duration_us": 1000000
+      },
       "stats": {
         "bytes_out": 15000,
         "bytes_in": 120000,
@@ -44,22 +51,31 @@ PulseVector captures network activity: flow summaries, protocol metadata, and se
         "packets_in": 150
       },
       "tls": {
+        "version": "TLS 1.3",
+        "cipher_suite": "TLS_AES_256_GCM_SHA384",
         "sni": "example.com",
-        "ja3": "hash...",
-        "ja3s": "hash...",
-        "cert_chain_fps": ["sha256:..."]
+        "issuer": "CN=Let's Encrypt Authority X3",
+        "subject": "CN=example.com",
+        "cert_fingerprint_sha256": "sha256:abcdef..."
       },
       "dns": {
-        "queries": ["example.com"],
-        "answers": [{"name": "example.com", "type": "A", "data": "93.184.216.34"}]
+        "query_name": "example.com",
+        "query_type": "A",
+        "response_code": "NOERROR",
+        "answers": [{"type": "A", "value": "93.184.216.34", "ttl": 300}]
       },
       "http": {
         "method": "GET",
-        "uri": "/api/data",
-        "status": 200,
-        "request_headers": {},
-        "response_headers": {}
+        "url": "/api/data",
+        "status_code": 200,
+        "host": "example.com",
+        "user_agent": "Mozilla/5.0",
+        "content_type": "application/json"
       },
+      "fingerprints": [
+        {"kind": "ja3", "value": "hash..."},
+        {"kind": "ja3s", "value": "hash..."}
+      ],
       "extensions": {}
     }
   }
@@ -104,9 +120,10 @@ All values are integers.
 
 Optional objects for protocol-specific data:
 
-- **tls**: TLS handshake metadata (SNI, JA3/JA3S fingerprints, certificate chain)
-- **dns**: DNS queries and responses
-- **http**: HTTP request/response metadata
+- **tls**: TLS handshake metadata (version, cipher suite, SNI, certificate info)
+- **dns**: DNS query and response data (query_name, query_type, response_code, answers)
+- **http**: HTTP request/response metadata (method, url, status_code, host, user_agent, content_type)
+- **fingerprints**: Array of typed fingerprint objects (ja3, ja3s, ja4, hassh, etc.) with `kind` and `value`
 
 ### Raw Artifact Reference
 
@@ -182,5 +199,4 @@ Full schema: `schemas/payloads/pulsevector.payload.schema.json`
 
 ## Examples
 
-- Flow slice: `examples/records/pulsevector-record.jsonl`
 - Profile: `examples/profiles/profile-pulse.default.95.json`

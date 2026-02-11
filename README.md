@@ -10,13 +10,13 @@
 
 Open Vectors is a family of JSONL-based schemas for capturing high-volume, high-fidelity signals from multiple domains:
 
-| Vector | Domain | Status |
-|--------|--------|--------|
-| **RFVector** | Radio frequency observations | Pilot-ready |
-| **PulseVector** | Network activity (flows, events) | Design-ready |
-| **FlowVector** | Content streams (web, social, firehose) | Spec-first |
-| **ExchangeVector** | Financial/digital asset transactions | Spec-first |
-| **VideoVector** | Video activity (segments, tracks, events) | Spec-first |
+| Vector | Domain | Status | Version |
+|--------|--------|--------|---------|
+| **RFVector** | Radio frequency observations | Reference implementation available | v0.2.0 |
+| **PulseVector** | Network activity (flows, events) | Reference implementation available | v0.2.0 |
+| **FlowVector** | Content streams (web, social, firehose) | Reference implementation available | v0.2.0 |
+| **ExchangeVector** | Financial/digital asset transactions | Reference implementation available | v0.2.0 |
+| **VideoVector** | Video activity (segments, tracks, events) | Reference implementation available | v0.2.0 |
 
 Each Vector provides:
 
@@ -79,7 +79,7 @@ See [docs/conformance/levels.md](docs/conformance/levels.md) for details.
 
 ## Version
 
-Current specification version: **v0.1.7**
+Current specification version: **v0.2.0**
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 

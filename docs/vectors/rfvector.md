@@ -1,8 +1,10 @@
 # RFVector
 
-**Status: Pilot-ready**
+**Status: Reference implementation available**
 
 RFVector captures radio frequency observations: spectrum captures, signal detections, and derived features like wavelet fingerprints.
+
+> **Note**: This vector has a reference implementation via the `rfvector-plugin` in DataAnvil-Plugins.
 
 ## Use Cases
 
@@ -51,9 +53,8 @@ RFVector captures radio frequency observations: spectrum captures, signal detect
       },
       "hardware": {
         "antenna_model": "omnidirectional",
-        "antenna_gain_dbi": 3,
-        "receiver": "RTL-SDR",
-        "receive_gain_db": 40
+        "gain_dB_x100": 300,
+        "receiver": "RTL-SDR"
       },
       "session_id": "capture-session-001",
       "extensions": {}
@@ -214,5 +215,5 @@ Full schema: `schemas/payloads/rfvector.payload.schema.json`
 
 ## Examples
 
-- Basic capture: `examples/records/rfvector-record.jsonl`
+- Basic capture: `examples/example-rfvector-record.jsonl`
 - Profile: `examples/profiles/profile-rf.default.95.json`

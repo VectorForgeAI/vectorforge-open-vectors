@@ -22,27 +22,31 @@ ExchangeVector captures financial and digital asset transactions: payments, sett
 | `transaction_error_v1` | Error during transaction processing |
 | `manifest_v1` | Continuity Level 2 window manifest (optional) |
 
-## Payload Structure (Draft)
+## Payload Structure
 
 ```json
 {
   "payload": {
     "exchange": {
       "kind": "transaction_event_v1",
-      "transaction_id": "txn-uuid",
+      "txn_id": "txn-uuid",
+      "event_id": "evt-uuid",
+      "status": "captured",
       "lifecycle_state": "captured",
       "event_type": "capture",
       "occurred_us": 1738368000000000,
       "amount": {
         "value": "1250.37",
-        "currency": "USD",
+        "asset": "USD",
         "precision": 2
       },
-      "fees": {
-        "value": "2.50",
-        "currency": "USD",
-        "precision": 2
-      },
+      "fees": [
+        {
+          "value": "2.50",
+          "asset": "USD",
+          "fee_type": "processing"
+        }
+      ],
       "parties": {
         "payer": {"id": "account-123", "type": "bank_account"},
         "payee": {"id": "merchant-456", "type": "merchant"}
@@ -67,7 +71,9 @@ ExchangeVector captures financial and digital asset transactions: payments, sett
 ## Key Fields
 
 ### Transaction Identification
-- **transaction_id**: Unique transaction identifier
+- **txn_id**: Unique transaction identifier
+- **event_id**: Unique event identifier for this lifecycle event
+- **status**: Current status of the transaction
 - **lifecycle_state**: Current state (pending, authorized, captured, settled, refunded, etc.)
 - **event_type**: What happened (authorize, capture, settle, refund, chargeback)
 
@@ -79,7 +85,7 @@ Currency amounts as decimal strings (not floats):
 {
   "amount": {
     "value": "1250.37",
-    "currency": "USD",
+    "asset": "USD",
     "precision": 2
   }
 }
