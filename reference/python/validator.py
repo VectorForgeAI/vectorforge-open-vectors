@@ -120,15 +120,20 @@ def validate_level_a(records: list[dict], schemas_dir: Path) -> tuple[int, int, 
             all_errors.append(f"Record {i}: {errors}")
             continue
 
-        # Validate envelope schema
+        # Validate record against the record sub-schema (no $refs, safe to extract)
+        record_sub_schema = vector_schema["properties"]["record"]
         envelope_errors = validate_record_schema(
-            data['record'], vector_schema, jsonschema.Draft202012Validator
+            data['record'], record_sub_schema, jsonschema.Draft202012Validator
         )
         errors.extend(envelope_errors)
 
-        # Validate DIVT schema
+        # Validate DIVT — inline $defs so internal $refs resolve correctly
+        divt_validator_schema = {
+            "$ref": "#/$defs/DIVT",
+            "$defs": divt_schema["$defs"],
+        }
         divt_errors = validate_record_schema(
-            data['divt'], divt_schema, jsonschema.Draft202012Validator
+            data['divt'], divt_validator_schema, jsonschema.Draft202012Validator
         )
         errors.extend(divt_errors)
 
