@@ -27,6 +27,7 @@ Vector-specific payload schemas are in the `payloads/` subdirectory:
 | `flowvector.payload.schema.json` | FlowVector | Spec-first |
 | `exchangevector.payload.schema.json` | ExchangeVector | Spec-first |
 | `videovector.payload.schema.json` | VideoVector | Spec-first |
+| `cloudvector.payload.schema.json` | CloudVector | Spec-first (POC) |
 
 ## Usage
 
