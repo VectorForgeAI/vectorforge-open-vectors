@@ -1,0 +1,172 @@
+{
+  "$id": "https://vectorforge.io/schemas/v0.1.0/cloudvector.payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CloudVector Payload Schema (v0.1.0) - cloud_observation_v1",
+  "description": "Normalized cloud audit-log observation. One record per cloud API call (AWS CloudTrail, Azure Monitor Activity Log, GCP Cloud Audit Log). Carries the nine-channel behavioral content used by downstream entity-behavior analytics: the original six channels (activity_rate, peer_diversity, burstiness, entropy, novelty, reversal_rate) plus three cloud-specific channels (data_volume, error_rate, privilege_escalation_rate).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_type", "timestamp", "object_id", "metadata"],
+  "properties": {
+    "event_type": {
+      "const": "cloud_observation_v1",
+      "description": "Record type discriminator. Pinned to cloud_observation_v1 for this schema version."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of the cloud API event (UTC). Sourced from CloudTrail eventTime, Azure eventTimestamp, or GCP timestamp."
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for the calling principal (mirrors metadata.content.entity_id). Format prefix indicates provider: 'iam:' for AWS IAM ARNs, 'az:' for Azure callers, 'gcp:' for GCP principal emails."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content", "event_id", "source"],
+      "properties": {
+        "content": { "$ref": "#/$defs/content" },
+        "event_id": {
+          "type": "string",
+          "description": "Provider-native event identifier (CloudTrail eventID, Azure eventDataId, GCP insertId). May be empty if the source omitted it."
+        },
+        "source": {
+          "type": "string",
+          "description": "Logical sensor identifier set by the plugin caller (e.g. 'aws-prod-account-123')."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Nine-channel behavioral content + cloud context. Field naming is shared across CloudTrail, Azure Monitor, and GCP Audit parsers so downstream analytics is provider-agnostic.",
+      "required": [
+        "entity_id",
+        "peer_id",
+        "domain",
+        "amount",
+        "inter_arrival_ms",
+        "property_bucket",
+        "novelty_token",
+        "direction_token",
+        "data_volume_bytes",
+        "error_bucket",
+        "escalation_token",
+        "cloud_provider",
+        "account_id",
+        "region",
+        "event_name",
+        "event_source",
+        "source_ip",
+        "user_agent",
+        "user_type",
+        "error_code",
+        "error_message",
+        "sensor_id",
+        "session_id"
+      ],
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Calling principal. AWS: 'iam:<arn>' or 'iam:<type>:<account>'. Azure: 'az:<caller>'. GCP: 'gcp:<principalEmail>'. Used by activity_rate, peer_diversity, burstiness, novelty, reversal_rate, data_volume, error_rate, and privilege_escalation_rate channels."
+        },
+        "peer_id": {
+          "type": "string",
+          "description": "Resource the principal acted on. AWS: resource ARN if present, else '<eventSource>/<inferredKey>'. Azure: resourceId. GCP: protoPayload.resourceName. Used by peer_diversity and novelty channels."
+        },
+        "domain": {
+          "const": "cloud",
+          "description": "Fixed domain tag. Always 'cloud' for this record type."
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Activity-rate count. Always 1 for one-event-one-record emission."
+        },
+        "inter_arrival_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Milliseconds since this entity_id's previous observation in this stream. 0 for the first observation. Drives the burstiness channel."
+        },
+        "property_bucket": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Coarse action bucket: '<service>:<action_class>'. action_class is one of read, mutate, destroy, auth, other. Drives the entropy channel."
+        },
+        "novelty_token": {
+          "enum": ["first", "seen"],
+          "description": "'first' the first time (entity_id, peer_id) is observed in this stream, 'seen' thereafter. Drives the novelty channel."
+        },
+        "direction_token": {
+          "enum": ["read", "write"],
+          "description": "Action direction. Read for Get/List/Describe/Head/BatchGet/Select/etc. (configurable via read_ops). Write otherwise. Drives the reversal_rate channel."
+        },
+        "data_volume_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Bytes transferred for this event. AWS: sum of bytesTransferredIn/Out, objectSize, contentLength. GCP: response.size. Azure: 0 (not extracted in v0.1.0). Drives the data_volume channel (cloud-specific)."
+        },
+        "error_bucket": {
+          "enum": ["error", "ok"],
+          "description": "'error' if the API call failed (CloudTrail errorCode/errorMessage present, Azure resultType in {Failure, Failed, Error}, GCP status.code != 0), 'ok' otherwise. Drives the error_rate channel (cloud-specific)."
+        },
+        "escalation_token": {
+          "enum": ["escalate", "normal"],
+          "description": "'escalate' if event_name (or methodName) is in the configured privilege-escalation list, 'normal' otherwise. Drives the privilege_escalation_rate channel (cloud-specific)."
+        },
+        "cloud_provider": {
+          "enum": ["aws", "azure", "gcp"],
+          "description": "Source cloud provider. Set by the parser, not by configuration."
+        },
+        "account_id": {
+          "type": "string",
+          "description": "Cloud-provider account identifier. AWS: recipientAccountId or userIdentity.accountId. Azure: subscriptionId. GCP: project_id. Empty string if unavailable."
+        },
+        "region": {
+          "type": "string",
+          "description": "Cloud-provider region/location string. AWS: awsRegion. Azure: location/resourceLocation. GCP: resource.labels.location. Empty string if unavailable."
+        },
+        "event_name": {
+          "type": "string",
+          "description": "Provider-native event name (CloudTrail eventName, Azure operationName tail segment, GCP methodName tail segment)."
+        },
+        "event_source": {
+          "type": "string",
+          "description": "Provider-native event source (CloudTrail eventSource, e.g. 's3.amazonaws.com'; Azure: literal 'azure.monitor'; GCP: protoPayload.serviceName)."
+        },
+        "source_ip": {
+          "type": "string",
+          "description": "Caller IP address as reported by the provider. May be empty."
+        },
+        "user_agent": {
+          "type": "string",
+          "description": "Caller user-agent string as reported by the provider. May be empty."
+        },
+        "user_type": {
+          "type": "string",
+          "description": "Provider-native principal type (CloudTrail userIdentity.type, Azure identity scope, GCP principalSubject). May be empty."
+        },
+        "error_code": {
+          "type": "string",
+          "description": "Provider-native error code if the call failed; empty string otherwise."
+        },
+        "error_message": {
+          "type": "string",
+          "description": "Provider-native error message if the call failed; empty string otherwise."
+        },
+        "sensor_id": {
+          "type": "string",
+          "description": "Logical sensor identifier supplied to the parser by the caller. Mirrors metadata.source."
+        },
+        "session_id": {
+          "type": "string",
+          "description": "Optional session/correlation identifier supplied to the parser by the caller. Empty string if not set."
+        }
+      }
+    }
+  }
+}
